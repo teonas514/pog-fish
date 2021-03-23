@@ -9,11 +9,11 @@ use Intervention\Image\ImageManagerStatic as Image;
 class UserController
 {
     public function logIn() {
-        View::render("logIn.twig");
+        View::render("users/logIn.twig");
     }
 
     public function register() {
-        View::render("register.twig");
+        View::render("users/register.twig");
     }
 
     public function secruityCheck() {

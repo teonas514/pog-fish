@@ -1,8 +1,7 @@
-{% extends "abstracts/navbar.twig" %}
-
+{% extends "abstracts/base.twig" %}
+{% block title %}pog fish{% endblock %}
 {% block content %}
-<h1>
-    pogfish
-</h1>
-<p> {{ name }}</p>
+    <h1>pog fish</h1>
+    <p>{{ name }}</p>
+    <img src="{{ profile_picture }}" alt="profile picture">
 {% endblock %}

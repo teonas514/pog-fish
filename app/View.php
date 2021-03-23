@@ -18,12 +18,12 @@ class View
         $this->twig = new Environment($loader, []);
     }
 
-    private static function getTwig()
+    private static function getTwig(): ?Environment
     {
         return static::getInstance()->twig;
     }
 
-    public static function getInstance()
+    public static function getInstance(): ?View
     {
         if (self::$instance === null) {
             self::$instance = new View();
@@ -33,7 +33,11 @@ class View
 
     public static function render($page, $data = [])
     {
-        $template = self::getTwig()->load($page);
-        echo $template->render($data);
+        try {
+            $template = self::getTwig()->load($page);
+            echo $template->render($data);
+        } catch (LoaderError | RuntimeError | SyntaxError $e) {
+            echo "twig load error";
+        }
     }
 }
