@@ -1,8 +1,15 @@
 <?php
 require '../vendor/autoload.php';
+session_start();
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $r->addRoute('GET', '/home', 'HomeController::home');
+    $r->addRoute('GET', '/', 'HomeController::home');
+    $r->addRoute('GET', '/log-in', 'UserController::logIn');
+    $r->addRoute('GET', '/register', 'UserController::register');
+    $r->addRoute('POST', '/security-check', 'UserController::secruityCheck');
+    $r->addRoute('GET', '/users/{id:\d+}', 'UserController::show');
+
+
     // {id} must be a number (\d+)
 });
 

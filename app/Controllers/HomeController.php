@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Controllers;
+use App\Models\User;
+use App\View;
 
 class HomeController
 {
@@ -11,6 +13,11 @@ class HomeController
 
     public function home()
     {
-
+        $data = [];
+        $user = User::getLoggedInUser();
+        if ($user) {
+            $data = $user->display();
+        }
+        View::render("home.twig", $data);
     }
 }

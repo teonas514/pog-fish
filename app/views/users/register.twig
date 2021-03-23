@@ -1,0 +1,16 @@
+{% extends "../abstracts/navbar.twig" %}
+
+{% block content %}
+    <h1> register </h1>
+    <form enctype="multipart/form-data" method="post" action="/security-check">
+        <label>name:</label>
+        <input name="name" type="text">
+        <label>password:</label>
+        <input name="password" type="password">
+        <label>profile picture:</label>
+        <input name="profile-picture" type="file">
+        <button type="submit" name="register">REGISTER</button>
+
+    </form>
+    <img src="{{ legoFigure }}">
+{% endblock %}
