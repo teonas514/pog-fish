@@ -16,7 +16,7 @@ class UserController
         View::render("users/register.twig");
     }
 
-    public function secruityCheck() {
+    public function checkCredentials() {
         $username = $_POST["name"] ?? null;
         $password = $_POST["password"] ?? null;
         $user = null;

@@ -43,25 +43,41 @@ class Database
         bool $all = true
     )
     {
-        $columnString = "";
-        foreach ($fields as $field) {
-            $columnString = "$columnString $field,";
-        }
-        $columnString = substr($columnString, 0, strlen($columnString) - 1); //remove last ","
-
-        $query = "SELECT$columnString FROM $table WHERE";
+        $columnString = self::arrayToString($fields);
+        $query = "SELECT $columnString FROM $table WHERE";
         foreach ($filterArray as $field => $value) {
             $query = $query . " $field = :$field AND";
         }
         $query = substr($query, 0, strlen($query) - 4); //remove last " AND"
-
-        //$query = "$query ORDER BY id";
         $stmt = static::getPDO()->prepare($query);
-        $params = [];
-        foreach ($filterArray as $field => $value) {
-            $params[":$field"] = $value;
-        }
+        $params = self::addPrefixToKeys($filterArray, ":");
         return self::fetchWithBoundParams($query, $params, $all);
+    }
+
+    public static function insert($table, $values)
+    {
+        $keys = array_keys($table);
+        $queryString = "INSERT INTO $table (" . self::arrayToString($keys) .") VALUES (".
+            self::arrayToString($keys, ":").")";
+        $params = self::addPrefixToKeys($values, ":");
+        self::executeWithBoundParams($queryString, $params);
+    }
+
+    public static function addPrefixToKeys($array, $prefix)
+    {
+        foreach ($array as $key => $value) {
+            $array["$prefix$key"] = $value;
+        }
+        return $array;
+    }
+    //["element1", "element2", "element3"] to "element1, element2, elmenent3"
+    public static function arrayToString($array, $prefix = "") {
+        $string = "";
+        foreach ($array as $value) {
+            $string = "$string$prefix$value, ";
+        }
+        $string = substr($string, 0, strlen($string) - 2); //remove last ", "
+        return $string;
     }
 
     public static function executeWithBoundParams($query, $params) {
@@ -73,7 +89,8 @@ class Database
         return $stmt;
     }
 
-    public static function fetchWithBoundParams($query, $params, $all = true) {
+    public static function fetchWithBoundParams($query, $params, $all = true)
+    {
         $stmt = self::executeWithBoundParams($query, $params);
         if ($all) {
             return $stmt->fetchAll();

@@ -1,0 +1,16 @@
+{% extends "abstracts/base.twig" %}
+
+{% block title %}
+    post
+{% endblock %}
+
+{% block content %}
+    <h1> post </h1>
+    <form enctype="multipart/form-data" method="post" action="/create-post">
+        <label>name:</label>
+        <input name="name" type="text">
+        <label>password:</label>
+        <input name="body" type="text">
+        <button type="submit" name="post">POST</button>
+    </form>
+{% endblock %}

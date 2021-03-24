@@ -15,29 +15,23 @@ class Model
         $this->id = $id;
         $this->fields = [];
     }
-
-    private function overlayFields($newFields): void
+    //returns instance of which ever class called it (return type static)
+    public static function getWhere($fields, $serial="id")//: ?static
     {
-        foreach ($newFields as $field => $value) {
-            $this->fields[$field] = $value;
+        $result = Database::fetchWithFilter(static::TABLE,
+            $fields,
+            [$serial],
+            false);
+        if($result) {
+            $instance = new static($result[$serial]);
+            $instance->fields = $fields;
+            return $instance;
         }
+        return null;
     }
 
-    private function requireFields($requiredFields): bool
-    {
-        $missingFields = [];
-        foreach($requiredFields as $requiredField) {
-            if (!in_array($requiredField, $this->fields)) {
-                array_push($missingFields, $requiredField);
-            }
-        }
-        $result = Database::fetchWithFilter(static::TABLE, ["id" => $this->id], $missingFields, false);
-        if($result) {
-            $this->overlayFields($result);
-            return true;
-        }
-        //nothing with that id found
-        return false;
+    public static function create($fields) {
+        Database::insert(static::TABLE, $fields);
     }
 
     public function getFields(...$fields): ?array {
@@ -50,4 +44,33 @@ class Model
         }
         return $return;
     }
+
+    public function setFields($newFields) {
+        foreach ($newFields as $field => $value) {
+            $this->fields[$field] = $value;
+        }
+    }
+
+    public function setField($key, $value) {
+        $this->fields[$key] = $value;
+    }
+
+    private function requireFields($requiredFields): bool
+    {
+        $missingFields = [];
+        foreach($requiredFields as $requiredField) {
+            if (!in_array($requiredField, $this->fields)) {
+                array_push($missingFields, $requiredField);
+            }
+        }
+        $result = Database::fetchWithFilter(static::TABLE, ["id" => $this->id], $missingFields, false);
+        if($result) {
+            $this->setFields($result);
+            return true;
+        }
+        //nothing with that id found
+        return false;
+    }
+
+
 }

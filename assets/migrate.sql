@@ -1,13 +1,22 @@
-drop table if exists users;
+drop table if exists users cascade;
 create table users(
-    name text not null unique,
-    password text not null,
+    name varchar(255) not null unique,
+    password varchar(255) not null,
     profile_picture text not null,
     created_at timestamptz not null default now(),
     id serial unique
 );
 
-create index index_name
-    on users(id);
+drop table if exists posts;
+create table posts
+(
+    name       varchar(255) not null unique,
+    body       varchar(255) not null,
+    created_at timestamptz  not null default now(),
+    id         serial unique,
+    author_id int,
+    primary key (id),
+    foreign key (author_id) references users(id)
+);
 
 explain analyze select * from users;

@@ -16,7 +16,10 @@ class HomeController
         $data = [];
         $user = User::getLoggedInUser();
         if ($user) {
-            $data = $user->display();
+            $display = $user->display();
+            if ($display) {
+                $data = $display;
+            }
         }
         View::render("home.twig", $data);
     }

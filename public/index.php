@@ -6,8 +6,10 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/', 'HomeController::home');
     $r->addRoute('GET', '/log-in', 'UserController::logIn');
     $r->addRoute('GET', '/register', 'UserController::register');
-    $r->addRoute('POST', '/security-check', 'UserController::secruityCheck');
+    $r->addRoute('POST', '/security-check', 'UserController::checkCredentials');
     $r->addRoute('GET', '/users/{id:\d+}', 'UserController::show');
+    $r->addRoute('GET', '/post', 'PostController::createView');
+    $r->addRoute('POST', '/post', 'PostController::create');
 });
 // Fetch method and URI from somewhere
 $httpMethod = $_SERVER['REQUEST_METHOD'];

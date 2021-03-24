@@ -9,26 +9,16 @@ class User extends Model
     public const TABLE = "users";
 
     /*
-     * fabriker
+     * factories
      */
     public static function getUserFromNameAndPassword($name, $password): ?User {
-        $result = Database::fetchWithFilter("users",
-                ["name" => $name, "password" => $password],
-                ["id"],
-                false);
-        if ($result) {
-            return new User($result["id"]);
-        }
-        return null;
+        return User::getWhere(["name" => $name, "password" => $password]);
     }
 
     public static function createUser($name, $password, $profilePicture):?User {
         Database::executeWithBoundParams("INSERT INTO users (name, password, profile_picture) VALUES (:name, :pass, :picture)",
             [":name" => $name, ":pass" => $password, ":picture" => $profilePicture]);
-        $user = User::getUserFromNameAndPassword($name, $password); //get id of the user we just created
-
-        $user->fields["name"] = $name;
-        $user->fields["password"] = $password;
+        $user =  User::getUserFromNameAndPassword($name, $password);
         $user->fields["profile_picture"] = $profilePicture;
 
         return $user;
@@ -44,10 +34,11 @@ class User extends Model
             $user->fields["name"] = $name;
             return $user;
         }
-
         return null;
     }
-
+    /*
+     * methods
+     */
     public function logIn()
     {
         $_SESSION = $this->getFields("name", "id");
@@ -56,5 +47,10 @@ class User extends Model
     public function display(): ?array
     {
         return $this->getFields("name", "profile_picture");
+    }
+
+    public function createPost($name, $body): Post
+    {
+        return Post::createPost($this->id, $name, $body);
     }
 }
