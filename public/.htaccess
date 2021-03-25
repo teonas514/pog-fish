@@ -1,4 +1,5 @@
 RewriteEngine On
 RewriteCond %{Request_Filename} !-F
 RewriteCond %{Request_Filename} !-d
-RewriteRule ^.*$ index.php [QSA,L]
+RewriteCond %{REQUEST_URI} !\.(?:jpe?g|gif|bmp|png|tiff|css|js|mp4|webp|webm)$ [NC]
+RewriteRule ^ index.php [QSA,L]

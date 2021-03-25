@@ -1,7 +1,7 @@
 {% extends "abstracts/base.twig" %}
 {% block title %}pog fish{% endblock %}
 {% block content %}
-    <h1>pog fish</h1>
-    <p>{{ name }}</p>
-    <img src="{{ profile_picture }}" alt="profile picture">
+    <h3>welcome <span class="name">{{ user.name }}</span>!</h3>
+    <hr>
+    <img src="{{ user.profile_picture }}" alt="profile picture">
 {% endblock %}

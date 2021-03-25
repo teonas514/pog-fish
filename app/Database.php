@@ -56,7 +56,10 @@ class Database
 
     public static function insert($table, $values)
     {
-        $keys = array_keys($table);
+        var_dump("in database");
+        var_dump($table);
+        var_dump($values);
+        $keys = array_keys($values);
         $queryString = "INSERT INTO $table (" . self::arrayToString($keys) .") VALUES (".
             self::arrayToString($keys, ":").")";
         $params = self::addPrefixToKeys($values, ":");
@@ -113,6 +116,7 @@ class Database
 
     public static function quickExecute($query)
     {
+        var_dump($query);
         $stmt = static::getPDO()->prepare($query);
         $stmt->execute();
         return $stmt;

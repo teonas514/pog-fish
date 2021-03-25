@@ -22,9 +22,8 @@ class UserController
         $user = null;
         if(($_POST["register"] ?? false) !== false) {
             $imagePath = $_FILES['profile-picture']['tmp_name'];
-
             $image = Image::make($imagePath);
-            $image->resize(128,128);
+            $image->resize(32,32);
             $image->encode("jpg", 0);
             $profilePicture = utf8_encode((string) $image->encode('data-url')); //blob
             $user = User::createUser($username, $password, $profilePicture);
@@ -32,7 +31,7 @@ class UserController
             $user = User::getUserFromNameAndPassword($username, $password);
         }
         $user->logIn();
-        View::render("users/show.twig", $user->display());
+        header("Location: /");
     }
 
     public function show($vars) {
@@ -41,7 +40,7 @@ class UserController
         if($user) {
             $display = $user->display();
             if($display) {
-                View::render("users/show.twig", $display);
+                View::render("users/show.twig",["user" => $display]);
             }
         }
     }

@@ -30,7 +30,9 @@ class Model
         return null;
     }
 
-    public static function create($fields) {
+    public static function insert($fields) {
+        var_dump(static::TABLE);
+        var_dump($fields);
         Database::insert(static::TABLE, $fields);
     }
 

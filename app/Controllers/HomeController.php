@@ -18,9 +18,14 @@ class HomeController
         if ($user) {
             $display = $user->display();
             if ($display) {
-                $data = $display;
+                $data["user"] = $display;
             }
         }
+
         View::render("home.twig", $data);
+    }
+
+    public function style() {
+        require "style.css";
     }
 }

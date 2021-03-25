@@ -1,13 +1,87 @@
+
+
+header {
+    background: #0f2332;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 32px;
+}
+
+#logo {
+    color: white;
+    margin: 0;
+    padding: 0;
+    text-decoration: underline cornflowerblue;
+}
+
+nav {
+    background: #0f2332;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+}
+
 nav > ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 64px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
 }
 
 body {
-    background: red;
+    background: white;
+    margin: 0;
 }
 
-p {
-    text-align: center;
+h1, h2, h3, h4, h5 {
+    font-family: 'Linux Libertine', 'Georgia', 'Times', serif
+}
+
+p, label, a  {
+    font-family: sans-serif;
+}
+
+#wrapper {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+html, body {
+    background: grey;
+}
+
+#wrapper {
+    background: white;
+}
+
+.warning {
+    color: red;
+    font-weight: bold;
+}
+
+
+form {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
 }

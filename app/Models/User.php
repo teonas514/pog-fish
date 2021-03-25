@@ -16,8 +16,7 @@ class User extends Model
     }
 
     public static function createUser($name, $password, $profilePicture):?User {
-        Database::executeWithBoundParams("INSERT INTO users (name, password, profile_picture) VALUES (:name, :pass, :picture)",
-            [":name" => $name, ":pass" => $password, ":picture" => $profilePicture]);
+        self::insert(["name" => $name, "pass" => $password, "picture" => $profilePicture]);
         $user =  User::getUserFromNameAndPassword($name, $password);
         $user->fields["profile_picture"] = $profilePicture;
 

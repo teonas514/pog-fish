@@ -1,0 +1,10 @@
+{% extends "abstracts/base.twig" %}
+
+{% block title %}
+    user - {{ post.name }}
+{% endblock %}
+
+{% block content %}
+    <h4> {{ post.name }}</h4>
+    <p>{{ post.body }}</p>
+{% endblock %}
