@@ -16,7 +16,7 @@ class User extends Model
     }
 
     public static function createUser($name, $password, $profilePicture):?User {
-        self::insert(["name" => $name, "pass" => $password, "picture" => $profilePicture]);
+        self::insert(["name" => $name, "password" => $password, "profile_picture" => $profilePicture]);
         $user =  User::getUserFromNameAndPassword($name, $password);
         $user->fields["profile_picture"] = $profilePicture;
 

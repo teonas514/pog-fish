@@ -11,7 +11,7 @@ drop table if exists posts;
 create table posts
 (
     name       varchar(255) not null unique,
-    body       varchar(255) not null,
+    body       text not null,
     created_at timestamptz  not null default now(),
     id         serial unique,
     author_id int,
