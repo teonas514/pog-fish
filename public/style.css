@@ -1,4 +1,7 @@
-
+html, body {
+    background: lightsteelblue;
+    margin: 0;
+}
 
 header {
     background: #0f2332;
@@ -19,13 +22,11 @@ header {
 
 nav {
     background: #0f2332;
-}
-
-nav {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 24px;
+    border-bottom: outset 1px #0f2332;
 }
 
 nav > ul {
@@ -34,7 +35,7 @@ nav > ul {
     padding: 0;
     display: flex;
     justify-content: center;
-    gap: 64px;
+    gap: 96px;
 }
 
 nav a {
@@ -44,11 +45,6 @@ nav a {
 
 nav a:hover {
     text-decoration: underline;
-}
-
-body {
-    background: white;
-    margin: 0;
 }
 
 h1, h2, h3, h4, h5 {
@@ -64,14 +60,9 @@ p, label, a  {
     margin: auto;
     display: flex;
     flex-direction: column;
-}
-
-html, body {
-    background: grey;
-}
-
-#wrapper {
+    padding: 64px;
     background: white;
+    border: outset white 1px;
 }
 
 .warning {
@@ -79,9 +70,19 @@ html, body {
     font-weight: bold;
 }
 
+.profile-picture {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+}
 
 form {
     display: flex;
     flex-direction: column;
     max-width: 300px;
+    padding: 4px;
+    margin: 4px;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 8px;
 }
