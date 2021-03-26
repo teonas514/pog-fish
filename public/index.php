@@ -4,15 +4,18 @@ session_start();
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/', 'HomeController::home');
-    //$r->addRoute('GET', '/style.css', 'HomeController::style');
 
     $r->addRoute('GET', '/log-in', 'UserController::logIn');
     $r->addRoute('GET', '/register', 'UserController::register');
-    $r->addRoute('POST', '/security-check', 'UserController::checkCredentials');
     $r->addRoute('GET', '/users/{id:\d+}', 'UserController::show');
+    $r->addRoute('GET', '/users', 'UserController::list');
+    $r->addRoute('POST', '/security-check', 'UserController::checkCredentials');
+
     $r->addRoute('GET', '/post', 'PostController::createView');
-    $r->addRoute('POST', '/create-post', 'PostController::create');
     $r->addRoute('GET', '/posts/{id:\d+}', 'PostController::show');
+    $r->addRoute('GET', '/posts', 'PostController::list');
+    $r->addRoute('POST', '/create-post', 'PostController::create');
+
 });
 // Fetch method and URI from somewhere
 $httpMethod = $_SERVER['REQUEST_METHOD'];

@@ -35,8 +35,6 @@ class Model
     }
 
     public static function insert($fields) {
-        var_dump(static::TABLE);
-        var_dump($fields);
         Database::insert(static::TABLE, $fields);
     }
 

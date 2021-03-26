@@ -2,6 +2,7 @@
 namespace App;
 
 use PDO;
+use function GuzzleHttp\Psr7\str;
 
 class Database
 {
@@ -87,19 +88,17 @@ class Database
     public static function insert($table, $values)
     {
         $keys = array_keys($values);
-        $queryString = "INSERT INTO $table (" . self::arrayToString($keys) .") VALUES (".
-            self::arrayToString($keys, ":").")";
-        $params = self::addPrefixToKeys($values, ":");
-        self::executeWithBoundParams($queryString, $params);
+        $queryString = "INSERT INTO $table (" . self::arrayToString($keys) .") VALUES (". self::toQuestionMarks($values) . ")";
+        self::executeWithBoundParams($queryString, $values);
     }
 
-    public static function addPrefixToKeys($array, $prefix)
-    {
-        $newArray = [];
-        foreach ($array as $key => $value) {
-            $newArray["$prefix$key"] = $value;
+    private static function toQuestionMarks($array): string {
+        $string = "";
+        for($i = 0; $i < sizeof($array); $i++) {
+            $string = "$string?, ";
         }
-        return $newArray;
+        $string = substr($string, 0, strlen($string) - 2); //remove last ", "
+        return $string;
     }
     //["element1", "element2", "element3"] to "element1, element2, elmenent3"
     public static function arrayToString($array, $prefix = "")
@@ -123,10 +122,10 @@ class Database
 
     public static function executeWithBoundParams($query, $params) {
         $stmt = static::getPDO()->prepare($query);
-        $index = 0;
-        foreach($params as $value) {
+        $index = 1;
+        foreach($params as $key => $_) {
+            $stmt->bindParam($index,$params[$key]);
             $index = $index + 1;
-            $stmt->bindParam($index,$value);
         }
         $stmt->execute();
         return $stmt;

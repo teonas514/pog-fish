@@ -8,4 +8,8 @@
     <h2> {{ user.name }}</h2>
     <img class="profile-picture" src="{{ user.profile_picture }}" alt="profile picture">
     <hr>
+    <h3>posts:</h3>
+    {% for post in posts %}
+        <a href="/posts/{{ post.id }}">{{ post.name }}</a>
+    {% endfor %}
 {% endblock %}

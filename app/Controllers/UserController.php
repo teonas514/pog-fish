@@ -40,8 +40,12 @@ class UserController
         if($user) {
             $display = $user->display();
             if($display) {
-                View::render("users/show.twig",["user" => $display]);
+                View::render("users/show.twig",["user" => $display, "posts" => $user->displayPosts()]);
             }
         }
+    }
+
+    public function list() {
+        View::render("users/list.twig");
     }
 }

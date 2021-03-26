@@ -40,4 +40,9 @@ class PostController
             }
         }
     }
+
+    public function list() {
+        View::render("posts/list.twig");
+
+    }
 }

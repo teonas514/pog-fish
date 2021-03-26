@@ -17,15 +17,10 @@ class HomeController
         $user = User::getLoggedInUser();
         if ($user) {
             $display = $user->display();
-            if ($display) {
+            if ($display) {//user not deleted
                 $data["user"] = $display;
             }
         }
-
         View::render("home.twig", $data);
-    }
-
-    public function style() {
-        require "style.css";
     }
 }

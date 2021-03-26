@@ -22,4 +22,6 @@ create table posts
 
 explain analyze select * from users;
 
-SELECT posts.name as posts$name, posts.body as post__body, users.id as users$id, users.name as users$name FROM posts INNER JOIN users ON users.id = posts.author_id WHERE posts.id = 3
+SELECT name, profile_picture, money FROM users WHERE id = 5;
+
+SELECT name, id FROM posts WHERE author_id = 10

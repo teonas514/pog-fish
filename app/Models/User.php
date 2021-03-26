@@ -43,6 +43,7 @@ class User extends Model
         $_SESSION = $this->getFields("name", "id");
     }
 
+
     public function display(): ?array
     {
         return $this->getFields("name", "profile_picture", "money");
@@ -51,5 +52,11 @@ class User extends Model
     public function createPost($name, $body): Post
     {
         return Post::createPost($this->id, $name, $body);
+    }
+
+    public function displayPosts(): array
+    {
+        $results = Database::fetchWithFilter("posts", ["author_id" => $this->id], ["name", "id"]);
+        return $results;
     }
 }

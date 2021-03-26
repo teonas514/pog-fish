@@ -5,8 +5,9 @@
         <h1>welcome <span class="name">{{ user.name }}</span>!</h1>
         <img class="profile-picture" src="{{ user.profile_picture }}" alt="profile picture">
         <label class="balance">money: {{ user.money }}</label>
-        <hr>
     {% else %}
         <h3>make an account!</h3>
+        <a href="/log-in"></a>
+        <a href="/register"></a>
     {% endif %}
 {% endblock %}

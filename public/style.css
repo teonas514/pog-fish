@@ -37,14 +37,12 @@ nav ul {
     gap: 48px;
 }
 
-nav li {
-}
-
 nav a {
-    padding: 16px;
+    padding: 4px;
     color: white;
     text-decoration: none;
     font-weight: bold;
+    display: block;
 }
 
 nav a:hover {
