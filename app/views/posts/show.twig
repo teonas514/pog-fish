@@ -5,6 +5,12 @@
 {% endblock %}
 
 {% block content %}
-    <h4> {{ post.name }}</h4>
-    <p>{{ post.body }}</p>
+    <article class="post">
+        <h2> {{ post.name }}</h2>
+        <p>Author: <a href="/users/{{ post.users.id }}">{{ post.users.name }}</a></p>
+        <hr>
+        <div class="post-body">
+            <p>{{ post.body }}</p>
+        </div>
+    </article>
 {% endblock %}

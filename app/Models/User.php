@@ -45,7 +45,7 @@ class User extends Model
 
     public function display(): ?array
     {
-        return $this->getFields("name", "profile_picture");
+        return $this->getFields("name", "profile_picture", "money");
     }
 
     public function createPost($name, $body): Post

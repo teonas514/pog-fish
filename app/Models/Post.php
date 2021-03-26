@@ -12,7 +12,6 @@ class Post extends Model
 
     public static function createPost($authorId, $name, $body):?Post {
         $fields = ["author_id" => $authorId, "name" => $name, "body" => $body];
-        var_dump($fields);
         self::insert($fields);
         $post = self::getWhere(["name" => $name]);
         $post->setFields($fields);
@@ -21,6 +20,11 @@ class Post extends Model
 
     public function display(): ?array
     {
-        return $this->getFields("name", "body");
+
+        /*
+         * getFields
+         *
+         */
+        return $this->getFieldsWithJoin(["name", "body"], ["id", "name"], "users", "author_id");
     }
 }

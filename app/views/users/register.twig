@@ -6,11 +6,12 @@
 
 {% block content %}
     <h1> register </h1>
+    <hr>
     <form enctype="multipart/form-data" method="post" action="/security-check">
         <label>name:</label>
-        <input name="name" type="text">
+        <input name="name" type="text" maxlength="255">
         <label>password:</label>
-        <input name="password" type="password">
+        <input name="password" type="password" maxlength="255">
         <label>profile picture:</label>
         <input name="profile-picture" type="file">
         <button type="submit" name="register">REGISTER</button>

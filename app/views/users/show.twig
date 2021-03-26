@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <h4> {{ user.name }}</h4>
-    <img src="{{ user.profile_picture }}" alt="profile picture">
+    <h2> {{ user.name }}</h2>
+    <img class="profile-picture" src="{{ user.profile_picture }}" alt="profile picture">
+    <hr>
 {% endblock %}

@@ -2,10 +2,10 @@
 {% block title %}pog fish{% endblock %}
 {% block content %}
     {% if user %}
-        <h3>welcome <span class="name">{{ user.name }}</span>!</h3>
-        <hr>
-        <hr>
+        <h1>welcome <span class="name">{{ user.name }}</span>!</h1>
         <img class="profile-picture" src="{{ user.profile_picture }}" alt="profile picture">
+        <label class="balance">money: {{ user.money }}</label>
+        <hr>
     {% else %}
         <h3>make an account!</h3>
     {% endif %}

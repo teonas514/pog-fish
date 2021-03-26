@@ -35,7 +35,33 @@ class Database
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     }
 
-    //todo: refactor this giant function
+    public static function fetchWithJoinAndFilter(
+        $table,
+        $foreignTable,
+        $fields,
+        $foreignFields,
+        $key,
+        $foreignKey,
+        $filterArray,
+        $all = true ,
+        $joinMethod = "INNER JOIN"
+    )
+    {
+        //todo: refactor this thing
+        $columnsString = "";
+        foreach ($fields as $field) {
+            $columnsString = "$columnsString$table.$field as $table". "__" .  "$field, ";
+        }
+        foreach ($foreignFields as $field) {
+            $columnsString = "$columnsString$foreignTable.$field as $foreignTable". "__" .  "$field, ";
+        }
+
+        $columnsString = substr($columnsString, 0, strlen($columnsString) - 2); //remove last ", "
+        $query ="SELECT " . $columnsString .
+            " FROM $table $joinMethod $foreignTable ON $foreignTable.$key = $table.$foreignKey";
+        return self::fetchQueryWithFilter($query, $filterArray, $all);
+    }
+
     public static function fetchWithFilter(
         string $table,
         array $filterArray = [],
@@ -44,21 +70,22 @@ class Database
     )
     {
         $columnString = self::arrayToString($fields);
-        $query = "SELECT $columnString FROM $table WHERE";
+        $query = "SELECT $columnString FROM $table";
+        return self::fetchQueryWithFilter($query, $filterArray, $all);
+    }
+
+    public static function fetchQueryWithFilter($query, $filterArray, $all) {
+        $query = "$query WHERE";
         foreach ($filterArray as $field => $value) {
-            $query = $query . " $field = :$field AND";
+            $query = $query . " $field = ? AND";
         }
         $query = substr($query, 0, strlen($query) - 4); //remove last " AND"
         $stmt = static::getPDO()->prepare($query);
-        $params = self::addPrefixToKeys($filterArray, ":");
-        return self::fetchWithBoundParams($query, $params, $all);
+        return self::fetchWithBoundParams($query, $filterArray, $all);
     }
 
     public static function insert($table, $values)
     {
-        var_dump("in database");
-        var_dump($table);
-        var_dump($values);
         $keys = array_keys($values);
         $queryString = "INSERT INTO $table (" . self::arrayToString($keys) .") VALUES (".
             self::arrayToString($keys, ":").")";
@@ -68,28 +95,21 @@ class Database
 
     public static function addPrefixToKeys($array, $prefix)
     {
+        $newArray = [];
         foreach ($array as $key => $value) {
-            $array["$prefix$key"] = $value;
+            $newArray["$prefix$key"] = $value;
         }
-        return $array;
+        return $newArray;
     }
     //["element1", "element2", "element3"] to "element1, element2, elmenent3"
-    public static function arrayToString($array, $prefix = "") {
+    public static function arrayToString($array, $prefix = "")
+    {
         $string = "";
         foreach ($array as $value) {
             $string = "$string$prefix$value, ";
         }
         $string = substr($string, 0, strlen($string) - 2); //remove last ", "
         return $string;
-    }
-
-    public static function executeWithBoundParams($query, $params) {
-        $stmt = static::getPDO()->prepare($query);
-        foreach($params as $bind => $value) {
-            $stmt->bindParam($bind,$params[$bind]);
-        }
-        $stmt->execute();
-        return $stmt;
     }
 
     public static function fetchWithBoundParams($query, $params, $all = true)
@@ -99,6 +119,17 @@ class Database
             return $stmt->fetchAll();
         }
         return $stmt->fetch();
+    }
+
+    public static function executeWithBoundParams($query, $params) {
+        $stmt = static::getPDO()->prepare($query);
+        $index = 0;
+        foreach($params as $value) {
+            $index = $index + 1;
+            $stmt->bindParam($index,$value);
+        }
+        $stmt->execute();
+        return $stmt;
     }
 
     public static function getInstance(): ?Database
@@ -116,7 +147,6 @@ class Database
 
     public static function quickExecute($query)
     {
-        var_dump($query);
         $stmt = static::getPDO()->prepare($query);
         $stmt->execute();
         return $stmt;
