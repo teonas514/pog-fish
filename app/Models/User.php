@@ -52,11 +52,11 @@ class User extends Model
 
     public function displayPosts(): array
     {
-        return Database::fetchWithFilter("posts", ["author_id" => $this->id], ["name", "id"]);
+        return Database::fetchWithFilter("posts", ["author_id" => $this->id], ["title", "id"]);
     }
 
-    public function createPost($name, $body): Post
+    public function createPost($title, $body): Post
     {
-        return Post::createPost($this->id, $name, $body);
+        return Post::createPost($this->id, $title, $body);
     }
 }

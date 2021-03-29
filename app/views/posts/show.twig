@@ -1,12 +1,12 @@
 {% extends "abstracts/base.twig" %}
 
 {% block title %}
-    user - {{ post.name }}
+    post - {{ post.title }}
 {% endblock %}
 
 {% block content %}
     <article class="post">
-        <h2> {{ post.name }}</h2>
+        <h2> {{ post.title }}</h2>
         <p>Author: <a href="/users/{{ post.users.id }}">{{ post.users.name }}</a></p>
         <hr>
         <div class="post-body">

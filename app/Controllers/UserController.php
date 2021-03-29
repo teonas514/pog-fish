@@ -2,6 +2,7 @@
 
 
 namespace App\Controllers;
+use App\Database;
 use App\Models\User;
 use App\View;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -46,6 +47,6 @@ class UserController
     }
 
     public function list() {
-        View::render("users/list.twig");
+        View::render("users/list.twig", ["users" => Database::quickFetch("SELECT name, id FROM users")]);
     }
 }

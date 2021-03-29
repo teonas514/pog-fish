@@ -21,13 +21,12 @@ class PostController
         if(!$user) {
             return;//todo:redirect to log in
         }
-        $name = $_POST["name"] ?? null;
+        $title = $_POST["title"] ?? null;
         $body = $_POST["body"] ?? null;
-        if(!$name or !$body) {
+        if(!$title or !$body) {
             return;//todo:redirect back to createView with message
         }
-
-        $post = $user->createPost($name, $body);
+        $post = $user->createPost($title, $body);
         header("Location: posts/" . $post->id);
     }
 
@@ -43,6 +42,6 @@ class PostController
     }
 
     public function list() {
-        View::render("posts/list.twig", ["posts" => Database::quickFetch("SELECT name, id FROM posts")]);
+        View::render("posts/list.twig", ["posts" => Database::quickFetch("SELECT title, id FROM posts")]);
     }
 }

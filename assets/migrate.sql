@@ -11,7 +11,7 @@ create table users(
 drop table if exists posts cascade ;
 create table posts
 (
-    name       varchar(255) not null unique,
+    title       varchar(255) not null unique,
     body       text not null,
     created_at timestamptz  not null default now(),
     id         serial unique,

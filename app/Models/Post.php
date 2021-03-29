@@ -21,16 +21,16 @@ class Post extends Model
         return $posts;
     }
 
-    public static function createPost($authorId, $name, $body):?Post {
-        $fields = ["author_id" => $authorId, "name" => $name, "body" => $body];
+    public static function createPost($authorId, $title, $body):?Post {
+        $fields = ["author_id" => $authorId, "title" => $title, "body" => $body];
         self::insert($fields);
-        $post = self::getWhere(["name" => $name]);
+        $post = self::getWhere(["title" => $title]);
         $post->setFields($fields);
         return $post;
     }
 
     public function display(): ?array
     {
-        return $this->getFieldsWithJoin(["name", "body"], ["id", "name"], "users", "author_id");
+        return $this->getFieldsWithJoin(["title", "body"], ["id", "name"], "users", "author_id");
     }
 }
