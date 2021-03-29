@@ -38,6 +38,10 @@ class Model
         Database::insert(static::TABLE, $fields);
     }
 
+    public static function getAll($requiredFields) {
+
+    }
+
     public function getFields(...$fields): ?array {
         if(!$this->requireFields($fields)) {
             return null;//couldnt require those fields

@@ -7,4 +7,9 @@
 {% block content %}
     <h1> posts </h1>
     <hr>
+    {% for post in posts %}
+        <a href="/posts/{{ post.id }}">
+            {{ post.name }}
+        </a>
+    {% endfor %}
 {% endblock %}

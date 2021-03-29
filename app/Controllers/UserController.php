@@ -21,12 +21,12 @@ class UserController
         $password = $_POST["password"] ?? null;
         $user = null;
         if(($_POST["register"] ?? false) !== false) {
-            $imagePath = $_FILES['profile-picture']['tmp_name'];
-            $image = Image::make($imagePath);
-            $image->resize(32,32);
-            $image->encode("jpg", 0);
-            $profilePicture = utf8_encode((string) $image->encode('data-url')); //blob
-            $user = User::createUser($username, $password, $profilePicture);
+//            $imagePath = $_FILES['profile-picture']['tmp_name'];
+//            $image = Image::make($imagePath);
+//            $image->resize(32,32);
+//            $image->encode("jpg", 0);
+//            $profilePicture = utf8_encode((string) $image->encode('data-url')); //blob
+            $user = User::createUser($username, $password);
         } else { //if ($_POST["log-in"] ?? false) {
             $user = User::getUserFromNameAndPassword($username, $password);
         }

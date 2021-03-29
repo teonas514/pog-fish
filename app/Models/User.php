@@ -7,6 +7,7 @@ use App\Database;
 class User extends Model
 {
     public const TABLE = "users";
+    public const DEFAULT_PFP = "/imgs/default_pfp.png";
 
     /*
      * factories
@@ -15,10 +16,9 @@ class User extends Model
         return User::getWhere(["name" => $name, "password" => $password]);
     }
 
-    public static function createUser($name, $password, $profilePicture):?User {
-        self::insert(["name" => $name, "password" => $password, "profile_picture" => $profilePicture]);
+    public static function createUser($name, $password):?User {
+        self::insert(["name" => $name, "password" => $password]);
         $user =  User::getUserFromNameAndPassword($name, $password);
-        $user->fields["profile_picture"] = $profilePicture;
 
         return $user;
     }
@@ -43,20 +43,20 @@ class User extends Model
         $_SESSION = $this->getFields("name", "id");
     }
 
-
     public function display(): ?array
     {
-        return $this->getFields("name", "profile_picture", "money");
+        $fields = $this->getFields("name", "profile_picture", "money");
+        $fields["profile_picture"] = $fields["profile_picture"] ? $fields["profile_picture"] : self::DEFAULT_PFP;
+        return $fields;
+    }
+
+    public function displayPosts(): array
+    {
+        return Database::fetchWithFilter("posts", ["author_id" => $this->id], ["name", "id"]);
     }
 
     public function createPost($name, $body): Post
     {
         return Post::createPost($this->id, $name, $body);
-    }
-
-    public function displayPosts(): array
-    {
-        $results = Database::fetchWithFilter("posts", ["author_id" => $this->id], ["name", "id"]);
-        return $results;
     }
 }

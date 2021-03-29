@@ -3,6 +3,7 @@
 
 namespace App\Controllers;
 
+use App\Database;
 use App\Models\Post;
 use App\Models\User;
 use App\View;
@@ -42,7 +43,6 @@ class PostController
     }
 
     public function list() {
-        View::render("posts/list.twig");
-
+        View::render("posts/list.twig", ["posts" => Database::quickFetch("SELECT name, id FROM posts")]);
     }
 }
