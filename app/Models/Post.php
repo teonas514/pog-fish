@@ -8,6 +8,7 @@ use App\Database;
 
 class Post extends Model
 {
+
     public const TABLE = "posts";
 
     public static function getAllPostsFrom($user): array {
@@ -23,14 +24,11 @@ class Post extends Model
 
     public static function createPost($authorId, $title, $body):?Post {
         $fields = ["author_id" => $authorId, "title" => $title, "body" => $body];
-        self::insert($fields);
-        $post = self::getWhere(["title" => $title]);
-        $post->setFields($fields);
-        return $post;
+        return self::insert($fields);
     }
 
     public function display(): ?array
     {
-        return $this->getFieldsWithJoin(["title", "body"], ["id", "name"], "users", "author_id");
+        return $this->requestFieldsWithForeginFields(["title", "body"], ["id", "name"], "users", "author_id");
     }
 }

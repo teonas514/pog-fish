@@ -7,9 +7,21 @@
 {% block content %}
     <h2> {{ user.name }}</h2>
     <img class="profile-picture" src="{{ user.profile_picture }}" alt="profile picture">
+    {% if loggedIn %}
+        <a href="/edit-profile">
+            <button>edit</button>
+        </a>
+    {% endif %}
+    <h3>bio:</h3>
+    <p>
+        {{ user.bio }}
+    </p>
+
     <hr>
     <h3>posts:</h3>
     {% for post in posts %}
         <a href="/posts/{{ post.id }}">{{ post.title }}</a>
     {% endfor %}
+
+
 {% endblock %}

@@ -27,7 +27,7 @@ class PostController
             return;//todo:redirect back to createView with message
         }
         $post = $user->createPost($title, $body);
-        header("Location: posts/" . $post->id);
+        header("Location: posts/" . $post->getId());
     }
 
     public function show($vars) {

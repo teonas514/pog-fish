@@ -1,0 +1,17 @@
+{% extends "abstracts/base.twig" %}
+
+{% block title %}
+    edit - {{ name }}
+{% endblock %}
+
+{% block content %}
+    <h2> {{ user.name }}</h2>
+
+    <form enctype="multipart/form-data" action="/update-user" method="post">
+        <label>profile picture:</label>
+        <input name="profile-picture" type="file">
+        <textarea name="bio" rows="4" cols="60" maxlength="2047">{{ user.bio }}</textarea>
+        <button type="submit" name="save">SAVE</button>
+    </form>
+    <hr>
+{% endblock %}

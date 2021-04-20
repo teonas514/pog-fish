@@ -85,11 +85,23 @@ class Database
         return self::fetchWithBoundParams($query, $filterArray, $all);
     }
 
-    public static function insert($table, $values)
+    public static function update($table, $values, $id, $serial="id") {
+        $query = "UPDATE $table SET " .
+            self::arrayToString(array_keys($values), "", " = ?") .
+            " WHERE $serial = ?";
+        $values[$serial] = $id;
+        self::executeWithBoundParams($query,  $values);
+    }
+
+    public static function insert($table, $values, $getId = false): ?int
     {
         $keys = array_keys($values);
         $queryString = "INSERT INTO $table (" . self::arrayToString($keys) .") VALUES (". self::toQuestionMarks($values) . ")";
         self::executeWithBoundParams($queryString, $values);
+        if ($getId) {
+            return (int)self::getPDO()->lastInsertId();
+        }
+        return null;
     }
 
     private static function toQuestionMarks($array): string {
@@ -101,11 +113,11 @@ class Database
         return $string;
     }
     //["element1", "element2", "element3"] to "element1, element2, elmenent3"
-    public static function arrayToString($array, $prefix = "")
+    public static function arrayToString($array, $prefix = "", $suffix = "")
     {
         $string = "";
         foreach ($array as $value) {
-            $string = "$string$prefix$value, ";
+            $string = "$string$prefix$value$suffix, ";
         }
         $string = substr($string, 0, strlen($string) - 2); //remove last ", "
         return $string;
@@ -123,6 +135,7 @@ class Database
     public static function executeWithBoundParams($query, $params) {
         $stmt = static::getPDO()->prepare($query);
         $index = 1;
+
         foreach($params as $key => $_) {
             $stmt->bindParam($index,$params[$key]);
             $index = $index + 1;

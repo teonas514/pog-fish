@@ -17,7 +17,7 @@ class HomeController
         $user = User::getLoggedInUser();
         if ($user) {
             $display = $user->display();
-            if ($display) {//user not deleted
+            if ($display["name"] ?? false) {//user not deleted
                 $data["user"] = $display;
             }
         }
