@@ -9,7 +9,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/register', 'UserController::register');
     $r->addRoute('GET', '/users/{id:\d+}', 'UserController::show');
     $r->addRoute('GET', '/users', 'UserController::list');
-    $r->addRoute('POST', '/security-check', 'UserController::checkCredentials');
+    $r->addRoute('POST','/security-check', 'UserController::checkCredentials');
     $r->addRoute('GET', '/edit-profile', 'UserController::edit');
     $r->addRoute('GET', '/profile', 'UserController::profile');
     $r->addRoute('POST', '/update-user', 'UserController::update');

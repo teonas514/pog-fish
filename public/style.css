@@ -81,7 +81,7 @@ p, label, a  {
 form {
     display: flex;
     flex-direction: column;
-    max-width: 300px;
+    max-width: 100%;
     padding: 4px;
     margin: 4px;
     justify-content: center;
@@ -102,4 +102,11 @@ hr {
 .post-body {
     padding: 4px;
     font-size: 14px;
+}
+
+#tags {
+    list-style-type: none;
+    display: flex;
+    gap: 48px;
+    width: 100%;
 }

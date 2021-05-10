@@ -58,11 +58,10 @@ class UserController
             return null;
         }
         $image = Image::make($imagePath);
-        $image->resize(128,128);
-        $image->encode("jpeg", 0);
+        $image->resize(128, 128);
+        $image->encode(User::PFP_EXTENSTION, 0);
         $unique = substr(base64_encode(md5( mt_rand() )), 0, 15);
-
-        $image->save(User::PFPS . $unique . User::PFP_EXTENSTION);
+        $image->save(User::pfpNameToPath($unique));
         return $unique;
     }
 

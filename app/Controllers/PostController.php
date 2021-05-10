@@ -10,9 +10,11 @@ use App\View;
 
 class PostController
 {
+
     public function createView()
     {
-        View::render("posts/create.twig");
+        $tags = Database::quickFetch("SELECT name, id FROM tags");
+        View::render("posts/create.twig", ["tags" => $tags]);
     }
 
     public function create()
@@ -23,10 +25,19 @@ class PostController
         }
         $title = $_POST["title"] ?? null;
         $body = $_POST["body"] ?? null;
+
+        $tags = [];
+        foreach(array_keys($_POST) as $key) {//Change aaa to beetter name
+            [$field, $id] = explode("-", $key);
+            if ($field === "tag") {
+                array_push($tags, $id);
+            }
+        }
+
         if(!$title or !$body) {
             return;//todo:redirect back to createView with message
         }
-        $post = $user->createPost($title, $body);
+        $post = $user->createPost($title, $body, $tags);
         header("Location: posts/" . $post->getId());
     }
 

@@ -56,6 +56,13 @@ create table tags
     id serial unique
 );
 
+drop table if exists awards cascade;
+create table awards
+(
+    name varchar(16),
+    cost float not null default 16,
+    id serial unique
+);
 
 drop table if exists post_tags cascade;
 create table post_tags
@@ -66,7 +73,14 @@ create table post_tags
     foreign key (tag_id) references tags(id)
 );
 
-
+drop table if exists post_awards cascade;
+create table post_awards
+(
+    post_id int,
+    award_id int,
+    foreign key (post_id) references posts(id),
+    foreign key (award_id) references tags(id)
+);
 
 select *
 from users where id=2;

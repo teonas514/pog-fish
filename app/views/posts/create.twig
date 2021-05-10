@@ -11,7 +11,16 @@
         <label>title:</label>
         <input name="title" type="text" maxlength="255">
         <label>body:</label>
-        <textarea name="body" rows="4" cols="60" maxlength="2047"></textarea>
+        <textarea name="body" rows="16" cols="140" maxlength="2047"></textarea>
+        <h5>Tags:</h5>
+        <ul id="tags">
+        {% for tag in tags %}
+            <li>
+                <label for="{{ tag.name }}">{{ tag.name }}</label>
+                <input id="{{ tag.name }}" name="tags[]" type="checkbox" value="{{ tag.id }}">
+            </li>
+        {% endfor %}
+        </ul>
         <button type="submit" name="post">POST</button>
     </form>
 {% endblock %}

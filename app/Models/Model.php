@@ -9,9 +9,16 @@ use App\Database;
  */
 class Model
 {
-    private array $tableFields = []; // fields that come from table
     private array $setFields = []; // fields that have been set by php
-    private array $foreignFields = []; // fields that come from foreing tables (CAN'T BE SET BY PHP)
+
+    private array $tableFields = []; // fields that come from table
+    private array $foreignFields = []; // fields that come from foreing tables
+    private array $manyToManyFields = []; //list of fields from many to many tables
+
+    private array $requiredFields = [];
+    private array $requiredForeginTables = [];
+    private array $requiredManyToManyTables = [];
+
     private int $id;
     public const TABLE = "";
 
@@ -36,7 +43,7 @@ class Model
         }
         return null;
     }
-
+    //    -//-   -||-
     public static function insert($fields)
     {
         $id = Database::insert(static::TABLE, $fields, true);
@@ -44,7 +51,7 @@ class Model
     }
 
     /*
-     * getter
+     * getters
      */
 
     public function getField($field): ?string {
@@ -52,7 +59,7 @@ class Model
     }
 
     private function getAllFields(): array
-    { // overlays fields with set fields
+    {
         return array_merge($this->tableFields, $this->setFields);
     }
 
@@ -105,88 +112,60 @@ class Model
     }
 
     /*
-     *  requests table values
+     *  requires
      */
 
-    public function requestFields(...$fields): ?array {
-        if(!$this->requireFields($fields)) {
-            return null;//couldnt require those fields
-        }
-        $return = [];
-        foreach($fields as $field) {
-            $return[$field] = $this->getAllFields()[$field];
-        }
-        return $return;
+    protected function requireFields($fields) {
+        $this->requiredFields = $fields;
     }
 
-    public function requestFieldsWithForeginFields($fields, $foreginFields, $table, $key): ?array
-    {
-        if (!$this->requireForeignFields($fields, $foreginFields, $table, $key)) {
-            return null;
-        }
-        $return = [];
-        foreach($fields as $field) {
-            $return[$field] = $this->tableFields[$field];
-        }
-        $return[$table] = [];
-        foreach($foreginFields as $field) {
-            $return[$table][$field] = $this->foreignFields[$table][$field];
-        }
-        return $return;
+    protected function requireForeignFields($table, $fields, $foreignKey="id", $onThisKey="id") {
+        $this->requiredForeginTables[$table] = [
+            "foreignKey" => $foreignKey,
+            "onThisKey" => $onThisKey,
+            "fields" => $fields
+        ];
     }
 
-    /*
-     *  require
-     */
-
-    private function requireFields($requiredFields): bool
-    {
-        $missingFields = $this->getMissingFields($requiredFields);
-        $result = Database::fetchWithFilter(static::TABLE, ["id" => $this->id], $missingFields, false);
-        if($result) {
-            $this->setFields($result);
-            return true;
-        }
-        //nothing with that id found
-        return false;
+    protected function requireManyToManyFields($table, $linkingTable, $fields, $key = "id") {
+        $this->requiredManyToManyTables[$table] = [
+            "key" => $key,
+            "linkingTable" => $linkingTable,
+            "fields" => $fields
+        ];
     }
-
-    private function requireForeignFields($requiredFields, $requiredForeginFields, $table, $key): bool
+    //DOESNT PREVENT OVERFETCHING (THIS METHOD SHOULD ONLY BE RUN ONCE (per model) XD)
+    protected function fetch()
     {
-        $missingFields = $this->getMissingFields($requiredFields);
-        if (!isset($this->foreignFields[$table])) {
-            $this->foreignFields[$table] = [];
-        }
-        $missingForeignFields = $this->getMissingKeysFromArray($this->foreignFields[$table], $requiredForeginFields);
-        $result = Database::fetchWithJoinAndFilter(
-            static::TABLE,
-            $table,
-            $missingFields,
-            $missingForeignFields,
-            "id",
-            $key,
-            [static::TABLE.".id" => $this->id],
-            false);
+        $data = Database::fetchModel(static::TABLE, $this->getId(),
+            $this->requiredFields,
+            $this->requiredForeginTables,
+            $this->requiredManyToManyTables
+        );
+        //IF THERE WERE MANY TO MANY TABLES -> ARRAY OF ASSOCIATIVE ARRAYS
+        //OTHERWISE -> ONE ASSOCIATIVE ARRAY ONLY
+        foreach ($data as $array) {
+            $manyToManyFields = [];
+            foreach ($array as $field => $value) {
+                [$field, $table] = explode(Database::TABLE_RECOGNICTION_SEPEATOR, $field, 2);
+                if ($table === static::TABLE) { //no table -> this table (non-foreign)
+                    $this->tableFields[$field] = $value;
+                }
+                else if ($this->requiredForeginTables[$table] ?? false) { // none many to many
+                    $this->setForeignField($table, $field, $value);
+                }
+                else {
 
-        if(!$result) {
-            return  false;
-        }
-
-        foreach ($result as $key => $value) {
-            [$table, $field] = explode("__", $key, 2);
-            if($table == static::TABLE) {
-                $this->tableFields[$field] = $value;
-            }
-            else {
-                $this->setForeignField($table, $field, $value);
+                }
             }
         }
-        return true;
+        var_dump($this->tableFields);
+        var_dump($this->foreignFields);
+        var_dump($this->manyToManyFields);
     }
 
     public function save()
     {
         Database::update(static::TABLE, $this->setFields, $this->id);
-        //Database::executeWithBoundParams("UPDATE " .. static::TABLE .. "", );
     }
 }

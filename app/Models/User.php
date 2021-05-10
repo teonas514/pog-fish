@@ -9,7 +9,7 @@ class User extends Model
     public const TABLE = "users";
     public const DEFAULT_PFP = "/imgs/default_pfp.png";
     public const PFPS = "pfps/";
-    public const PFP_EXTENSTION = ".jpg";
+    public const PFP_EXTENSTION = "jpg";
 
     /*
      * factories
@@ -40,18 +40,24 @@ class User extends Model
         $_SESSION = $this->requestFields("name", "id");
     }
 
-    private function fromPfpToPath($name): string {
-        if(!$name) {
-            return self::DEFAULT_PFP;
-        }
-        // "/" is required due to routing
-        return "/" . self::PFPS . $name . self::PFP_EXTENSTION;
+    public static function pfpNameToPath($name): string
+    {
+        return self::PFPS . $name . "." . self::PFP_EXTENSTION;
     }
+
 
     public function display(): ?array
     {
-        $fields = $this->requestFields("name", "profile_picture", "money", "bio");
-        $fields["profile_picture"] = $this->fromPfpToPath($fields["profile_picture"] ?? false);
+        $this->requireFields(["name", "profile_picture", "money"]);
+        $this->requireForeignFields("roles", ["name", "rank"], "id", "role_id");
+        $this->fetch();
+
+        if($fields["profile_picture"] ?? false) {
+            $fields["profile_picture"] = "/" . self::pfpNameToPath($fields["profile_picture"]);
+        }
+        else {
+            $fields["profile_picture"] = self::DEFAULT_PFP;
+        }
         return $fields;
     }
 
@@ -60,9 +66,9 @@ class User extends Model
         return Database::fetchWithFilter("posts", ["author_id" => $this->getId()], ["title", "id"]);
     }
 
-    public function createPost($title, $body): Post
+    public function createPost(...$params): Post
     {
-        return Post::createPost($this->getId(), $title, $body);
+        return Post::createPost($this->getId(), ...$params);
     }
 
 

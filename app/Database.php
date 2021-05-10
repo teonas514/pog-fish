@@ -8,8 +8,10 @@ class Database
 {
     private ?PDO $pdo;
     private static ?\App\Database $instance = null;
+    public const TABLE_RECOGNICTION_SEPEATOR = "big_big_big_chungus"; //this string is not allowed to apear in table field names
+    public const ID = "id";
 
-    protected function __construct()
+    private function __construct()
     {
         $db = parse_url(getenv("DATABASE_URL"));
         $pdo = null;
@@ -35,6 +37,27 @@ class Database
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     }
+
+    /*
+     *  Singelton methods
+     */
+
+    private static function getInstance(): ?Database
+    {
+        if (self::$instance === null) {
+            self::$instance = new Database();
+        }
+        return self::$instance;
+    }
+
+    private static function getPDO(): ?PDO
+    {
+        return static::getInstance()->pdo;
+    }
+
+    /*
+     *  publics
+     */
 
     public static function fetchWithJoinAndFilter(
         $table,
@@ -104,24 +127,6 @@ class Database
         return null;
     }
 
-    private static function toQuestionMarks($array): string {
-        $string = "";
-        for($i = 0; $i < sizeof($array); $i++) {
-            $string = "$string?, ";
-        }
-        $string = substr($string, 0, strlen($string) - 2); //remove last ", "
-        return $string;
-    }
-    //["element1", "element2", "element3"] to "element1, element2, elmenent3"
-    public static function arrayToString($array, $prefix = "", $suffix = "")
-    {
-        $string = "";
-        foreach ($array as $value) {
-            $string = "$string$prefix$value$suffix, ";
-        }
-        $string = substr($string, 0, strlen($string) - 2); //remove last ", "
-        return $string;
-    }
 
     public static function fetchWithBoundParams($query, $params, $all = true)
     {
@@ -144,18 +149,30 @@ class Database
         return $stmt;
     }
 
-    public static function getInstance(): ?Database
+    public static function fetchModel(string $table, int $id, array $fields, array $foreigns, array $manyToManys): array
     {
-        if (self::$instance === null) {
-            self::$instance = new Database();
-        }
-        return self::$instance;
+        $fields = static::AlterElements($fields, function ($element) use ($table) {
+            return "$table.$element as $element" . static::TABLE_RECOGNICTION_SEPEATOR . $table;
+        });
+        $selectedFields = self::mergeArrayValues(
+            $fields,
+            self::toStringsFieldObjects($foreigns),
+            self::toStringsFieldObjects($manyToManys)
+        );
+
+        $query = "SELECT " . self::arrayToString($selectedFields) .  " FROM $table";
+
+        $query .= self::getForeignJoin($foreigns, $table);
+        $query .= self::getManyToManyJoin($foreigns, $table);
+
+        $query .= " WHERE $table.id = ?";
+
+        return self::fetchWithBoundParams($query, [$id]);
     }
 
-    public static function getPDO(): ?PDO
-    {
-        return static::getInstance()->pdo;
-    }
+    /*
+     *  quick (no security)
+     */
 
     public static function quickExecute($query)
     {
@@ -168,5 +185,89 @@ class Database
     {
         $stmt = self::quickExecute($query);
         return $stmt->fetchAll();
+    }
+
+    /*
+     *  helper methods (private)
+     */
+    //fetch model method
+    private static function toStringsFieldObjects($objectArray): array
+    {
+        $stringArray = [];
+        foreach ($objectArray as $foreignTable => $object) {
+            foreach ($object["fields"] as $field) {
+                $value = "$foreignTable.$field as $field" . static::TABLE_RECOGNICTION_SEPEATOR . "$foreignTable"; // "__" is to be able to differentiate where the value came from later on
+                array_push($stringArray, $value);
+            }
+        }
+        return $stringArray;
+    }
+    //fetch model method
+    private static function getForeignJoin($foreigns, $table): string
+    {
+        $string = "";
+        foreach ($foreigns as $foreignTable => $object) {
+            $string .= " JOIN $foreignTable ON $table." .
+                $object["onThisKey"] . " = $foreignTable." .
+                $object["foreignKey"];
+        }
+        return $string;
+    }
+    //fetch model method
+    private static function getManyToManyJoin($manyToManys, $table): string
+    {
+        $string = "";
+        foreach ($manyToManys as $foreignTable => $object) {
+            $singularForeign = self::shaveOffEnd($foreignTable, 1);
+            $singular = self::shaveOffEnd($table, 1);
+
+            $string .= " LEFT JOIN " . $object["linkingTable"] . " ON " .
+                "$table.id = " . $object["linkingTable"] . "." .  $singular . "_id " .
+                "LEFT JOIN " . $foreignTable. " ON " .
+                "$foreignTable.id = " . $object["linkingTable"] . "." . $singularForeign . "_id";
+        }
+        return $string;
+    }
+
+    private static function AlterElements($array, $function): array {
+        $newArray = [];
+        foreach ($array as $element) {
+            array_push($newArray, $function($element));
+        }
+        return $newArray;
+    }
+    //["element1", "element2", "element3"] to "element1, element2, elmenent3"
+    private static function arrayToString($array, $prefix = "", $suffix = "")
+    {
+        $string = "";
+        foreach ($array as $value) {
+            $string = "$string$prefix$value$suffix, ";
+        }
+        $string = substr($string, 0, strlen($string) - 2); //remove last ", "
+        return $string;
+    }
+
+    private static function shaveOffEnd(string $string, int $num):string {
+        return substr($string, 0, strlen($string) - $num);
+    }
+
+    private static function mergeArrayValues(...$arrays): array
+    { //creates array with the values of the arrays but doesnt care about keys
+        $merged = [];
+        foreach ($arrays as $array) {
+            foreach ($array as $value) {
+                array_push($merged, $value);
+            }
+        }
+        return $merged;
+    }
+
+    private static function toQuestionMarks($array): string {
+        $string = "";
+        for($i = 0; $i < sizeof($array); $i++) {
+            $string = "$string?, ";
+        }
+        $string = substr($string, 0, strlen($string) - 2); //remove last ", "
+        return $string;
     }
 }

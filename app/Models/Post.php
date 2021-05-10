@@ -8,8 +8,8 @@ use App\Database;
 
 class Post extends Model
 {
-
     public const TABLE = "posts";
+    private array $tags = [];
 
     public static function getAllPostsFrom($user): array {
         $results = Database::fetchWithFilter(static::TABLE, ["author_id" => $user->id], ["name", "id"]);
@@ -22,13 +22,27 @@ class Post extends Model
         return $posts;
     }
 
-    public static function createPost($authorId, $title, $body):?Post {
+    public static function createPost($authorId, $title, $body, $tags = []):?Post {
         $fields = ["author_id" => $authorId, "title" => $title, "body" => $body];
-        return self::insert($fields);
+        $post = self::insert($fields);
+        $post->addTags($tags);
+        return $post;
+    }
+
+    public function addTags($tags) { //optimize to one insert query
+        foreach ($tags as $tag) {
+            Database::insert("post_tags", [
+                "post_id" => $this->getId(),
+                "tag_id" => $tag
+            ]);
+        }
     }
 
     public function display(): ?array
     {
-        return $this->requestFieldsWithForeginFields(["title", "body"], ["id", "name"], "users", "author_id");
+        $this->requireFields(["title", "body"]);
+        $this->requireManyToManyFields("tags", "post_tags", ["name", "description"]);
+        $this->fetch();
+        return [];
     }
 }
