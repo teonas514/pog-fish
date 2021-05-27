@@ -5,6 +5,7 @@ namespace App\Models;
 
 
 use App\Database;
+use App\Select;
 
 class Post extends Model
 {
@@ -40,9 +41,15 @@ class Post extends Model
 
     public function display(): ?array
     {
-        $this->requireFields(["title", "body"]);
-        $this->requireManyToManyFields("tags", "post_tags", ["name", "description"]);
-        $this->fetch();
-        return [];
+        $select = new Select();
+        $select->requireFields(["title", "body"]);
+        $select->requireManyToManyFields("tags", "post_tags", ["name", "description"]);
+        $select->requireForeignFields("users", ["name", "id"], "author_id");
+        $this->fetch($select);
+        return [
+            "post" => $this->getFields(),
+            "author" => $this->getForeignFields("users"),
+            "tags" => $this->getManyToManyFields("tags"),
+        ];
     }
 }

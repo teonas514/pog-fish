@@ -7,6 +7,13 @@ create table roles
     id serial unique
 );
 
+drop table if exists layouts cascade;
+create table layouts
+(
+    id serial unique,
+    template_areas varchar(255)
+);
+
 drop table if exists users cascade;
 create table users(
     name varchar(255) not null unique,
@@ -17,9 +24,11 @@ create table users(
     created_at timestamptz not null default now(),
     id serial unique,
     role_id int default 1,
+    layout_id int default 1,
 
     primary key (id),
-    foreign key (role_id) references roles(id)
+    foreign key (role_id) references roles(id),
+    foreign key (layout_id) references layouts(id)
 );
 
 drop table if exists posts cascade ;
@@ -81,6 +90,3 @@ create table post_awards
     foreign key (post_id) references posts(id),
     foreign key (award_id) references tags(id)
 );
-
-select *
-from users where id=2;

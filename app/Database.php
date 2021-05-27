@@ -8,7 +8,7 @@ class Database
 {
     private ?PDO $pdo;
     private static ?\App\Database $instance = null;
-    public const TABLE_RECOGNICTION_SEPEATOR = "big_big_big_chungus"; //this string is not allowed to apear in table field names
+    public const TABLE_RECOGNICTION_SEPEATOR = "____"; //this string is not allowed to apear in table field names
     public const ID = "id";
 
     private function __construct()
@@ -59,55 +59,6 @@ class Database
      *  publics
      */
 
-    public static function fetchWithJoinAndFilter(
-        $table,
-        $foreignTable,
-        $fields,
-        $foreignFields,
-        $key,
-        $foreignKey,
-        $filterArray,
-        $all = true ,
-        $joinMethod = "INNER JOIN"
-    )
-    {
-        //todo: refactor this thing
-        $columnsString = "";
-        foreach ($fields as $field) {
-            $columnsString = "$columnsString$table.$field as $table". "__" .  "$field, ";
-        }
-        foreach ($foreignFields as $field) {
-            $columnsString = "$columnsString$foreignTable.$field as $foreignTable". "__" .  "$field, ";
-        }
-
-        $columnsString = substr($columnsString, 0, strlen($columnsString) - 2); //remove last ", "
-        $query ="SELECT " . $columnsString .
-            " FROM $table $joinMethod $foreignTable ON $foreignTable.$key = $table.$foreignKey";
-        return self::fetchQueryWithFilter($query, $filterArray, $all);
-    }
-
-    public static function fetchWithFilter(
-        string $table,
-        array $filterArray = [],
-        array $fields = [],
-        bool $all = true
-    )
-    {
-        $columnString = self::arrayToString($fields);
-        $query = "SELECT $columnString FROM $table";
-        return self::fetchQueryWithFilter($query, $filterArray, $all);
-    }
-
-    public static function fetchQueryWithFilter($query, $filterArray, $all) {
-        $query = "$query WHERE";
-        foreach ($filterArray as $field => $value) {
-            $query = $query . " $field = ? AND";
-        }
-        $query = substr($query, 0, strlen($query) - 4); //remove last " AND"
-        $stmt = static::getPDO()->prepare($query);
-        return self::fetchWithBoundParams($query, $filterArray, $all);
-    }
-
     public static function update($table, $values, $id, $serial="id") {
         $query = "UPDATE $table SET " .
             self::arrayToString(array_keys($values), "", " = ?") .
@@ -127,6 +78,41 @@ class Database
         return null;
     }
 
+    public static function fetchSelect(
+        string $table,
+        array $filter,
+        array $fields,
+        array $foreigns,
+        array $manyToManys,
+        int $limit,
+        bool $all = true
+    ): array
+    {
+        $fields = static::AlterElements($fields, function ($element) use ($table) {
+            return "$table.$element as $table" . self::TABLE_RECOGNICTION_SEPEATOR . $element;
+        });
+        $selectedFields = self::mergeArrayValues(
+            $fields,
+            self::toStringsFieldObjects($foreigns),
+            self::toStringsFieldObjects($manyToManys)
+        );
+        $query = "SELECT " . self::arrayToString($selectedFields) . " FROM $table";
+        $query .= self::getForeignJoin($foreigns, $table);
+        $query .= self::getManyToManyJoin($manyToManys, $table);
+        $values = [];
+        if(sizeof($filter) > 0) {
+            $query .= " WHERE ";
+            foreach ($filter as $table => $fields) {
+                foreach ($fields as $key => $value) {
+                    $query .= "$table.$key = ? AND ";
+                    array_push($values, $value);
+                }
+            }
+            $query = self::shaveOffEnd($query, 4);
+        }
+        $query .= " LIMIT $limit";
+        return self::fetchWithBoundParams($query, $values, $all);
+    }
 
     public static function fetchWithBoundParams($query, $params, $all = true)
     {
@@ -135,39 +121,18 @@ class Database
             return $stmt->fetchAll();
         }
         return $stmt->fetch();
+
     }
 
     public static function executeWithBoundParams($query, $params) {
         $stmt = static::getPDO()->prepare($query);
         $index = 1;
-
         foreach($params as $key => $_) {
             $stmt->bindParam($index,$params[$key]);
             $index = $index + 1;
         }
         $stmt->execute();
         return $stmt;
-    }
-
-    public static function fetchModel(string $table, int $id, array $fields, array $foreigns, array $manyToManys): array
-    {
-        $fields = static::AlterElements($fields, function ($element) use ($table) {
-            return "$table.$element as $element" . static::TABLE_RECOGNICTION_SEPEATOR . $table;
-        });
-        $selectedFields = self::mergeArrayValues(
-            $fields,
-            self::toStringsFieldObjects($foreigns),
-            self::toStringsFieldObjects($manyToManys)
-        );
-
-        $query = "SELECT " . self::arrayToString($selectedFields) .  " FROM $table";
-
-        $query .= self::getForeignJoin($foreigns, $table);
-        $query .= self::getManyToManyJoin($foreigns, $table);
-
-        $query .= " WHERE $table.id = ?";
-
-        return self::fetchWithBoundParams($query, [$id]);
     }
 
     /*
@@ -196,7 +161,7 @@ class Database
         $stringArray = [];
         foreach ($objectArray as $foreignTable => $object) {
             foreach ($object["fields"] as $field) {
-                $value = "$foreignTable.$field as $field" . static::TABLE_RECOGNICTION_SEPEATOR . "$foreignTable"; // "__" is to be able to differentiate where the value came from later on
+                $value = "$foreignTable.$field as $foreignTable" . self::TABLE_RECOGNICTION_SEPEATOR . "$field"; // "__" is to be able to differentiate where the value came from later on
                 array_push($stringArray, $value);
             }
         }
@@ -208,7 +173,7 @@ class Database
         $string = "";
         foreach ($foreigns as $foreignTable => $object) {
             $string .= " JOIN $foreignTable ON $table." .
-                $object["onThisKey"] . " = $foreignTable." .
+                $object["onKey"] . " = $foreignTable." .
                 $object["foreignKey"];
         }
         return $string;

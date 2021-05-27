@@ -31,19 +31,24 @@ class UserController
     }
 
     public function show($vars) {
-        $id = $vars["id"];
-        $user = new User($id);
-
-        $display = $user->display();
+        $id = (int)$vars["id"];
+        $user = null;
+        $isOwner = false;
         $loggedInUser = User::getLoggedInUser();
-        $test = $id === $loggedInUser->getId();
-        $posts = $user->displayPosts();
-        if($display["name"] ?? faLSe) { //if display wasn't able to get name then the user doesnt exist
-            View::render("users/show.twig",["user" => $display,
-                "posts" => $posts,
-                "loggedIn" =>  (int)$id === $loggedInUser->getId()
-            ]);
+
+        if ($loggedInUser) {
+            if ($loggedInUser->getId() === $id) {
+                $user = $loggedInUser;
+                $isOwner = true;
+            }
         }
+        if(!$user) {
+            $user = new User($id);
+        }
+        View::render("users/show.twig",["user" => $user->display(),
+            "posts" => $user->displayPosts(),
+            "isOwner" =>  $isOwner
+        ]);
     }
 
     public function list() {
@@ -52,7 +57,6 @@ class UserController
 
     private function getProfilePicture(): ?string
     {
-        var_dump($_FILES);
         $imagePath = $_FILES['profile-picture']['tmp_name'];
         if($_FILES["profile-picture"]["error"] !== 0) {
             return null;
@@ -86,7 +90,7 @@ class UserController
             return;
         }
         $display = $loggedInUser->display();
-        View::render("users/edit.twig", ["user" => $display]);
+        View::render("users/edit.twig", $display);
     }
 
     public function profile() {
@@ -95,7 +99,7 @@ class UserController
     }
 
     public function logOut() {
-
-
+        unset($_SESSION["logged-in-user"]);
+        header("Location: /log-in");
     }
 }

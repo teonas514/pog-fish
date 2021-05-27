@@ -5,12 +5,20 @@
 {% endblock %}
 
 {% block content %}
-    <article class="post">
+    <article class="card">
         <h2> {{ post.title }}</h2>
-        <p>Author: <a href="/users/{{ post.users.id }}">{{ post.users.name }}</a></p>
+        <ul id="tags">
+            {% for tag in tags %}
+                <li class="tag">
+                    <label for="{{ tag.name }}">{{ tag.name }}</label>
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Author: <a href="/users/{{ author.id }}">{{ author.name }}</a></p>
         <hr>
         <div class="post-body">
             <p>{{ post.body }}</p>
         </div>
     </article>
+
 {% endblock %}

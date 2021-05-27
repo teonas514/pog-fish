@@ -17,3 +17,17 @@ insert into awards (name, cost) values
     ('pog fish bronze', 2),
     ('wholesome', 1);
 
+insert into layouts (template_areas) values
+    ('["dlr pst usr"]'),
+    ('["dlr dlr dlr", "pst usr usr"]'),
+    ('["dlr pst pst", "dlr usr usr"]');
+
+insert into users (name, password, profile_picture, bio) VALUES ('bengt', 'bengt', null, 'jag är benght');
+
+insert into posts (title, body, author_id) values
+    ('title', 'body', 1);
+
+insert into post_tags (post_id, tag_id) values
+    (2, 2),
+    (2, 3),
+    (2, 4);

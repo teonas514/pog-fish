@@ -10,7 +10,6 @@ use App\View;
 
 class PostController
 {
-
     public function createView()
     {
         $tags = Database::quickFetch("SELECT name, id FROM tags");
@@ -21,24 +20,19 @@ class PostController
     {
         $user = User::getLoggedInUser();
         if(!$user) {
-            return;//todo:redirect to log in
+            //header("Location : /log-in");
+            header("Location: /log-in");
+            return;
         }
         $title = $_POST["title"] ?? null;
         $body = $_POST["body"] ?? null;
-
-        $tags = [];
-        foreach(array_keys($_POST) as $key) {//Change aaa to beetter name
-            [$field, $id] = explode("-", $key);
-            if ($field === "tag") {
-                array_push($tags, $id);
-            }
-        }
+        $tags = array_values($_POST["tags"]);
 
         if(!$title or !$body) {
-            return;//todo:redirect back to createView with message
+            return;//todo:redirect back to createView with error message
         }
         $post = $user->createPost($title, $body, $tags);
-        header("Location: posts/" . $post->getId());
+        header("Location: /posts/" . $post->getId());
     }
 
     public function show($vars) {
@@ -47,12 +41,12 @@ class PostController
         if($post) {
             $display = $post->display();
             if($display) {
-                View::render("posts/show.twig",["post" => $display]);
+                View::render("posts/show.twig", $display);
             }
         }
     }
 
     public function list() {
-        View::render("posts/list.twig", ["posts" => Database::quickFetch("SELECT title, id FROM posts")]);
+        View::render("posts/list.twig", ["posts" => Database::quickFetch("SELECT title, id FROM posts limit 16")]);
     }
 }

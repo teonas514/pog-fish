@@ -1,13 +1,20 @@
 {% extends "abstracts/head.twig" %}
 
 {% block body %}
+    {% if logged_in_user %}
+    <a href="/users/{{ logged_in_user.id }}">
+        <div>
+            <img class="profile-picture" src="{{ logged_in_user.profile_picture }}" alt="profile picture">
+            <p>{{ logged_in_user.name }}</p>
+        </div>
+    </a>
+    {% endif %}
     <header>
         <a href="/"><h2 id="logo">pog fish</h2></a>
     </header>
     <nav>
         <ul>
             <li><a href="/">home</a></li>
-            <li><a href="/profile">profile</a></li>
             <li><a href="/post">post</a></li>
             <li><a href="/users">users</a></li>
             <li><a href="/posts">posts</a></li>
@@ -19,6 +26,5 @@
 
     {% endblock %}
     </div>
-    <p>version: 69.420</p>
 {% endblock %}
 

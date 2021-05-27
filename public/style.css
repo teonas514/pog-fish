@@ -57,12 +57,16 @@ p, label, a  {
     font-family: sans-serif;
 }
 
+p, h1, h2, h3, h4, h5, label {
+    color: #222222;
+}
+
 #wrapper {
     max-width: 1100px;
     margin: auto;
     display: flex;
     flex-direction: column;
-    padding: 64px;
+    padding: 32px;
     background: white;
     border: outset white 2px;
 }
@@ -94,11 +98,6 @@ hr {
     border-style: outset;
 }
 
-.post {
-    border: outset white 2px;
-    padding: 8px;
-}
-
 .post-body {
     padding: 4px;
     font-size: 14px;
@@ -107,6 +106,43 @@ hr {
 #tags {
     list-style-type: none;
     display: flex;
-    gap: 48px;
-    width: 100%;
+    gap: 16px;
+    padding-inline-start: 0;
+    margin: 6px;
+}
+
+.tag {
+    padding: 2px 8px;
+    border-radius: 8px;
+    border-style: outset;
+}
+
+.tag > label {
+    font-size: 11px;
+}
+
+.card-container {
+    display: grid;
+}
+
+.money-label{
+    font-size: 32px;
+    color: darkgreen;
+}
+
+.card {
+    border: outset white 2px;
+    padding: 8px;
+}
+
+.posts {
+    grid-area: pst;
+}
+
+.money {
+    grid-area: dlr;
+}
+
+.user-info {
+    grid-area: usr;
 }

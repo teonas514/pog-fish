@@ -4,6 +4,7 @@ session_start();
 
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/', 'HomeController::home');
+    $r->addRoute('POST', '/update-layout', 'HomeController::updateLayout');
 
     $r->addRoute('GET', '/log-in', 'UserController::logIn');
     $r->addRoute('GET', '/register', 'UserController::register');
@@ -13,6 +14,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/edit-profile', 'UserController::edit');
     $r->addRoute('GET', '/profile', 'UserController::profile');
     $r->addRoute('POST', '/update-user', 'UserController::update');
+    $r->addRoute('GET', '/log-out', 'UserController::logOut');
 
     $r->addRoute('GET', '/post', 'PostController::createView');
     $r->addRoute('GET', '/posts/{id:\d+}', 'PostController::show');

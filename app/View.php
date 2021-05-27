@@ -1,6 +1,7 @@
 <?php
 namespace App;
 
+use App\Models\User;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -34,7 +35,12 @@ class View
     public static function render($page, $data = [])
     {
         try {
+
             $template = self::getTwig()->load($page);
+            $user = User::getLoggedInUser();
+            if($user) {
+                $data["logged_in_user"] = $user->headerDisplay();
+            }
             echo $template->render($data);
         } catch (LoaderError | RuntimeError | SyntaxError $e) {
             echo "twig load error";

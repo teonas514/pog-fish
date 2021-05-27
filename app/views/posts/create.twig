@@ -15,12 +15,14 @@
         <h5>Tags:</h5>
         <ul id="tags">
         {% for tag in tags %}
-            <li>
+            <li class="tag">
                 <label for="{{ tag.name }}">{{ tag.name }}</label>
                 <input id="{{ tag.name }}" name="tags[]" type="checkbox" value="{{ tag.id }}">
             </li>
         {% endfor %}
         </ul>
+        <br>
         <button type="submit" name="post">POST</button>
+
     </form>
 {% endblock %}

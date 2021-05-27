@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Database;
+use App\Fields;
+use App\Select;
 
 class User extends Model
 {
@@ -11,6 +13,7 @@ class User extends Model
     public const PFPS = "pfps/";
     public const PFP_EXTENSTION = "jpg";
 
+    static private User $loggedInUser;
     /*
      * factories
      */
@@ -24,20 +27,19 @@ class User extends Model
 
     public static function getLoggedInUser():?User
     {
-        $name = $_SESSION["name"] ?? false;
-        $id = $_SESSION["id"] ?? false;
-
-        if ($name and $id) {
-            return new User($id, ["name" => $name]);
+        if(self::$loggedInUser ?? false) {
+            return self::$loggedInUser;
         }
-        return null;
-    }
-    /*
-     * methods
-     */
-    public function logIn()
-    {
-        $_SESSION = $this->requestFields("name", "id");
+        if(!($_SESSION["logged-in-user"] ?? false)) return null;
+        $name = $_SESSION["logged-in-user"]["name"];
+        $id = $_SESSION["logged-in-user"]["id"];
+        $pfp = $_SESSION["logged-in-user"]["profile-picture"];
+        $fields = new Fields();
+        $fields->table = [
+            "name" => $name,
+            "profile_picture" => $pfp
+        ];
+        return new User($id, $fields);
     }
 
     public static function pfpNameToPath($name): string
@@ -45,31 +47,71 @@ class User extends Model
         return self::PFPS . $name . "." . self::PFP_EXTENSTION;
     }
 
+    /*
+     * methods
+     */
+
+    public function logIn()
+    {
+        $select = new Select();
+        $select->requireFields(["name", "profile_picture"]);
+        $this->fetch($select);
+        $_SESSION["logged-in-user"] = [
+            "name" => $this->getField("name"),
+            "profile-picture" => $this->getField("profile_picture"),
+            "id" => $this->getId()
+        ];
+    }
+
+    private function getProfilePicture(): string
+    {
+        if ($this->getField("profile_picture") === null) {
+            return self::DEFAULT_PFP;
+        }
+        else {
+            return  "/" . self::pfpNameToPath($this->getField("profile_picture"));
+        }
+    }
+
+    public function getFieldsWithProfilePicture(): array {
+        $fields = $this->getFields();
+        $fields["profile_picture"] = $this->getProfilePicture();
+        return $fields;
+    }
 
     public function display(): ?array
     {
-        $this->requireFields(["name", "profile_picture", "money"]);
-        $this->requireForeignFields("roles", ["name", "rank"], "id", "role_id");
-        $this->fetch();
+        $select = new Select();
+        $select->requireFields(["name", "profile_picture", "bio"]);
+        $select->requireForeignFields("roles", ["name", "rank"], "role_id");
+        $this->fetch($select);
+        return [
+            "user" => $this->getFieldsWithProfilePicture(),
+            "role" => $this->getForeignFields("roles")
+        ];
+    }
 
-        if($fields["profile_picture"] ?? false) {
-            $fields["profile_picture"] = "/" . self::pfpNameToPath($fields["profile_picture"]);
-        }
-        else {
-            $fields["profile_picture"] = self::DEFAULT_PFP;
-        }
-        return $fields;
+    public function headerDisplay(): array {
+        $display = $this->getFieldsWithProfilePicture();
+        $display["id"] = $this->getId();
+        return $display;
     }
 
     public function displayPosts(): array
     {
-        return Database::fetchWithFilter("posts", ["author_id" => $this->getId()], ["title", "id"]);
+        $posts = Post::GetWhere(["author_id" => $this->getId()], ["title"], true);
+        $display = [];
+        foreach ($posts as $post) {
+            array_push($display, [
+                "title" => $post->getFields()["title"],
+                "id" => $post->getId()
+            ]);
+        }
+        return $display;
     }
 
     public function createPost(...$params): Post
     {
         return Post::createPost($this->getId(), ...$params);
     }
-
-
 }

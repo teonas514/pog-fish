@@ -5,23 +5,26 @@
 {% endblock %}
 
 {% block content %}
-    <h2> {{ user.name }}</h2>
-    <img class="profile-picture" src="{{ user.profile_picture }}" alt="profile picture">
-    {% if loggedIn %}
+    <h2> {{ user.user.name }}</h2>
+    <img class="profile-picture" src="{{ user.user.profile_picture }}" alt="profile picture">
+    {% if isOwner %}
         <a href="/edit-profile">
             <button>edit</button>
         </a>
     {% endif %}
+    <h4>{{ user.role.name }} - {{ user.role.rank }}</h4>
     <h3>bio:</h3>
     <p>
-        {{ user.bio }}
+        {{ user.user.bio }}
     </p>
-
     <hr>
     <h3>posts:</h3>
+    <ul>
     {% for post in posts %}
-        <a href="/posts/{{ post.id }}">{{ post.title }}</a>
+        <li>
+          <a href="/posts/{{ post.id }}">{{ post.title }}</a>
+        </li>
     {% endfor %}
-
+    </ul>
 
 {% endblock %}

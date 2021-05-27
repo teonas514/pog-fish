@@ -1,12 +1,41 @@
 {% extends "abstracts/base.twig" %}
 {% block title %}pog fish{% endblock %}
 {% block content %}
-    {% if user %}
-        <h1>welcome <span class="name">{{ user.name }}</span>!</h1>
-        <img class="profile-picture" src="{{ user.profile_picture }}" alt="profile picture">
-        <label class="balance">money: {{ user.money }}</label>
+    {% if logged_in_user %}
+        <h1>welcome <span class="name">{{ logged_in_user.name }}</span>!</h1>
+        <hr>
+        <form action="/update-layout" method="post">
+            <label for="layouts">Change layout:</label>
+            <select name="layouts">
+                {% for id in layouts %}
+                    <option value="{{ id }}">{{ id }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" name="save">SAVE</button>
+        </form>
+        <div class="card-container" style="grid-template-areas:{% for line in template_areas %} '{{ line }}' {% endfor %}">
+            <article class="card posts">
+                <h3>posts</h3>
+                <hr>
+                {% for post in posts %}
+                    <li>
+                        <a href="/posts/{{ post.id }}">{{ post.title }}</a>
+                    </li>
+                {% endfor %}
+            </article>
+            <article class="card user-info">
+                <h3>user info</h3>
+                <hr>
+                <img src={{ user.user.profile_picture }}>
+                <p>{{ user.user.name }}</p>
+                <p>{{ user.role.name }} - {{ user.role.rank }}</p>
+            </article>
+            <article class="card money">
+                <h2 class="money-label">${{ user.user.money }}</h2>
+            </article>
+        </div>
     {% else %}
-        <h3>make an account or log in</h3>
+        <h1>make an account or log in</h1>
         <a href="/log-in">log in</a>
         <a href="/register">regsiter</a>
     {% endif %}
