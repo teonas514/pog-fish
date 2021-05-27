@@ -1,14 +1,6 @@
 # pog-fish
 Teo Näslund
 
-Man kan specificera vilka kolumner man vill ha med &columns[] i alla endpoints (alla WeatherController endpoints)
-
-Exempelvis:
-
-	vaderlek-diamond-rhinos/all?columns[]=gust&columns[]=wind_dir
-
-Ger alla *gust* och *wind_dir*. Har som standardvärde alla kolumner.
-
 ## Endpoints
 | Endpoint | Protokoll | Beskrivning |
 | --- | --- | --- |
