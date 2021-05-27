@@ -86,7 +86,7 @@ class Database
         array $manyToManys,
         int $limit,
         bool $all = true
-    ): array
+    )
     {
         $fields = static::AlterElements($fields, function ($element) use ($table) {
             return "$table.$element as $table" . self::TABLE_RECOGNICTION_SEPEATOR . $element;

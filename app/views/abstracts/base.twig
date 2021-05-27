@@ -18,7 +18,12 @@
             <li><a href="/post">post</a></li>
             <li><a href="/users">users</a></li>
             <li><a href="/posts">posts</a></li>
-            <li><a href="/log-out">log out</a></li>
+            {% if logged_in_user %}
+              <li><a href="/log-out">log out</a></li>
+            {% else %}
+                <li><a href="/register">register</a></li>
+                <li><a href="/log-in">log in</a></li>
+            {% endif %}
         </ul>
     </nav>
     <div id="wrapper">

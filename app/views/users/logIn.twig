@@ -7,7 +7,12 @@
 {% block content %}
     <h1> log in </h1>
     <hr>
+    {% if error %}
+        <label class="error">{{ error }}</label>
+    {% endif %}
+
     <form enctype="multipart/form-data" method="post" action="/security-check">
+
         <label>name:</label>
         <input name="name" type="text" maxlength="255">
         <label>password:</label>

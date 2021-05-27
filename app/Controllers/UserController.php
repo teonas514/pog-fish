@@ -4,17 +4,18 @@
 namespace App\Controllers;
 use App\Database;
 use App\Models\User;
+use App\Select;
 use App\View;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class UserController
 {
     public function logIn() {
-        View::render("users/logIn.twig");
+        View::render("users/logIn.twig", ["error" => $_GET["error"] ?? false]);
     }
 
     public function register() {
-        View::render("users/register.twig");
+        View::render("users/register.twig", ["error" => $_GET["error"] ?? false]);
     }
 
     public function checkCredentials() {
@@ -22,9 +23,19 @@ class UserController
         $password = $_POST["password"] ?? null;
         $user = null;
         if(($_POST["register"] ?? fALSe) !== FAlse) {
+            //check so name is unique
+            $data = Database::fetchWithBoundParams("SELECT id FROM users WHERE name = ?", [$username]);
+            if(count($data) > 0) {
+                header("Location: /register?error=Username already taken.");
+                return;
+            }
             $user = User::createUser($username, $password);
         } else { //if ($_POST["log-in"] ?? false) {
+            var_dump("yup");
             $user = User::getUserFromNameAndPassword($username, $password);
+            if(!$user) {
+                header("Location: /log-in?error=No username with that combination.");
+            }
         }
         $user->logIn();
         header("Location: /");
@@ -95,6 +106,11 @@ class UserController
 
     public function profile() {
         $user = User::getLoggedInUser();
+        if(!$user) {
+            header("Location: /log-in?error='You need to log in in order to see your profile'");
+            return;
+        }
+
         header("Location: /users/". $user->getId());
     }
 

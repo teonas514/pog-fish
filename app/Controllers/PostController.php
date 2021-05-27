@@ -10,6 +10,8 @@ use App\View;
 
 class PostController
 {
+    public const DISPLAY_MAX_POSTS = 16;
+
     public function createView()
     {
         $tags = Database::quickFetch("SELECT name, id FROM tags");
@@ -20,8 +22,7 @@ class PostController
     {
         $user = User::getLoggedInUser();
         if(!$user) {
-            //header("Location : /log-in");
-            header("Location: /log-in");
+            header("Location: /log-in?error=You need to log in in order to post.");
             return;
         }
         $title = $_POST["title"] ?? null;
@@ -47,6 +48,7 @@ class PostController
     }
 
     public function list() {
-        View::render("posts/list.twig", ["posts" => Database::quickFetch("SELECT title, id FROM posts limit 16")]);
+        $posts = Database::quickFetch("SELECT title, id FROM posts ORDER BY created_at LIMIT " . self::DISPLAY_MAX_POSTS);
+        View::render("posts/list.twig", ["posts" => $posts]);
     }
 }

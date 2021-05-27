@@ -84,6 +84,9 @@ class Select
             $limit,
             $all,
         );
+        if(!$fetch) {
+            return null;
+        }
         if($single) {
             if($all) {
                 return $this->formatSingle($fetch[0], $fetch, $table);// 1 fields

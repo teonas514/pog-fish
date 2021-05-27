@@ -109,6 +109,10 @@ class Model
         }
     }
 
+    /*
+     * Fetch
+     */
+
     private function filterSelect(Select &$select) {
         foreach ($this->fields->table as $field => $_) {
             $select->removeField($field);
